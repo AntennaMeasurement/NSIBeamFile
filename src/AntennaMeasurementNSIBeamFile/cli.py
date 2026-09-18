@@ -44,10 +44,10 @@ def main(argv: list[str] | None = None) -> int:
   elif argv and argv[0] == "pattern_cut":
     parser = argparse.ArgumentParser(prog="pattern_cut", description="Export pattern cut data from NSI beam files")
     parser.add_argument("--folder", help="Measurement data folder that contains the NSI beam files", type=str, nargs=1)
-    parser.add_argument("--constant_axis", help="Constant axis for the pattern cut", type=str, nargs=1)
-    parser.add_argument("--constant_axis_value", help="Value of the constant axis for the pattern cut", type=float, nargs=1)
-    parser.add_argument("--frequency", help="Frequency for the pattern cut", type=float, nargs=1)
-    parser.add_argument("--export", help="Export the pattern cut data", action="store_true")
+    parser.add_argument("--constant_axis", help="Constant axis name for the pattern cut like theta, phi ...", type=str, nargs=1)
+    parser.add_argument("--constant_axis_value", help="Value of the constant axis for the pattern cut in degrees", type=float, nargs=1)
+    parser.add_argument("--frequency", help="Frequency in the pattern cut data you are interested in GHz", type=float, nargs=1)
+    parser.add_argument("--export", help="Export the pattern cut data default behavior is True (can be disabled with --no-export)", action="store_true")
     parser.add_argument("--plot", help="Plot the pattern cut data", action="store_true")
     try:
       args = parser.parse_args(argv[1:])
@@ -58,7 +58,7 @@ def main(argv: list[str] | None = None) -> int:
       constant_axis = args.constant_axis[0]
       constant_axis_value = args.constant_axis_value[0]
       frequency = args.frequency[0] if args.frequency else 0.0
-      export = args.export
+      export = args.export if args.export is not None else True
       plot = args.plot
       measurement = AntennaMeasurementNSIBeamFile(folder)
       measurement.pattern_cut(constant_axis, constant_axis_value, frequency, export, plot)
