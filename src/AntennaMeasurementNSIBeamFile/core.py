@@ -1,0 +1,16 @@
+def hello() -> str:
+    return "Hello from AntennaMeasurementNSIBeamFile!"
+def hello() -> str:
+    return "Hello from AntennaMeasurementNSIBeamFile!"
+def hello() -> str:
+    return "Hello from AntennaMeasurementNSIBeamFile!"
+def hello() -> str:
+    return "Hello from AntennaMeasurementNSIBeamFile!"
+def hello() -> str:
+    return "Hello from AntennaMeasurementNSIBeamFile!"
+def hello() -> str:
+    return "Hello from AntennaMeasurementNSIBeamFile!"
+def hello() -> str:
+    return "Hello from AntennaMeasurementNSIBeamFile!"
+def hello() -> str:
+    return "Hello from AntennaMeasurementNSIBeamFile!"

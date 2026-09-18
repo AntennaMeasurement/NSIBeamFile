@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "AntennaMeasurementNSIBeamFile"
+version = "0.1.0"
+description = "NSI2000 Antenna Measurement Software Far-Field Beam File Parser"
+authors = [{name = "Hüseyin YİĞİT", email = "yigit.hsyn@gmail.com"}]
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/AntennaMeasurement/NSIBeamFile.git"
+
+[project.scripts]
+AntennaMeasurementNSIBeamFileCli = "AntennaMeasurementNSIBeamFile.cli:main"
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
