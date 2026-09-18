@@ -25,3 +25,42 @@ The command line interface allows you to interact with the AntennaMeasurement NS
 - `pattern_cut`: Export and plot pattern cut data from NSI beam files
 
 Use the `--help` flag with any command to see the available options.
+
+## Standalone executable
+
+The CLI can be bundled into a single executable with PyInstaller. Build on the
+same operating system and architecture where the executable will be used.
+
+### Windows PowerShell
+
+```powershell
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -e ".[build]"
+python -m PyInstaller --clean AntennaMeasurementNSIBeamFile.spec
+```
+
+The executable is created at
+`dist\AntennaMeasurementNSIBeamFileCli.exe`.
+
+### Linux or macOS
+
+```bash
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e '.[build]'
+python -m PyInstaller --clean AntennaMeasurementNSIBeamFile.spec
+```
+
+The executable is created at `dist/AntennaMeasurementNSIBeamFileCli`.
+
+Run the executable from a directory containing the measurement data, or pass
+an explicit data-folder path:
+
+```text
+AntennaMeasurementNSIBeamFileCli axes --folder sample_data
+AntennaMeasurementNSIBeamFileCli frequencies --folder sample_data
+AntennaMeasurementNSIBeamFileCli pattern_cut --folder sample_data --constant_axis theta --constant_axis_value 90 --frequency 10 --export
+```

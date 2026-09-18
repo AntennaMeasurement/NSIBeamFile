@@ -48,10 +48,54 @@ class AntennaMeasurementNSIBeamFile:
         if "X-pol Data" in lines[i]:
           self.max_rows = i+1
           break
+      
+      for i in range(len(lines)):
+        if "Far-field display setup" in lines[i]:
+          self.hangle_size = int(lines[i+2].split()[10])
+          self.vangle_size = int(lines[i+5].split()[10])
 
+      print(f"hangle_size: {self.hangle_size}, vangle_size: {self.vangle_size}")
       self.max_rows -= self.skipped_rows+2
       self.axes = [lines[self.skipped_rows-1].split()[0].replace("(deg)", "").strip(), lines[self.skipped_rows-1].split()[1].replace("(deg)", "").strip()]
-    
+  
+  # Swap axes if needed (e.g., to change the order of hangle and vangle)
+  def swap_axes(self) -> None:
+    for i, beam_file in enumerate(self.beam_files):
+      
+      hangle, vangle, co_amp, co_phase = np.loadtxt(beam_file, skiprows=self.skipped_rows, max_rows=self.max_rows, unpack=True)
+      hangle, vangle, cr_amp, cr_phase = np.loadtxt(beam_file, skiprows=self.skipped_rows+self.max_rows+2, max_rows=self.max_rows, unpack=True)
+      
+      # Generate angle lists by using min, max and step 
+      hangle_list = np.linspace(np.min(hangle), np.max(hangle), self.hangle_size)
+      vangle_list = np.linspace(np.min(vangle), np.max(vangle), self.vangle_size)
+      
+      co_amp_swapped = []
+      cr_amp_swapped = []
+      co_phase_swapped = []
+      cr_phase_swapped = []
+      hangle_swapped = []
+      vangle_swapped = []
+      
+      for m in range(self.hangle_size):
+        for n in range(self.vangle_size):
+          
+          for k in range(len(hangle)):
+            if hangle[k] == hangle_list[m] and vangle[k] == vangle_list[n]:
+              hangle_swapped.append(hangle[k])
+              vangle_swapped.append(vangle[k])
+              co_amp_swapped.append(co_amp[k])
+              cr_amp_swapped.append(cr_amp[k])
+              co_phase_swapped.append(co_phase[k])
+              cr_phase_swapped.append(cr_phase[k])
+              break
+            
+      # Write the swapped data back to the file or a new file
+      swapped_data_folder = os.path.join(".", "Swapped")
+      if not os.path.exists(swapped_data_folder):
+          os.makedirs(swapped_data_folder)
+      
+      np.savetxt(os.path.join(swapped_data_folder, os.path.basename(beam_file)), np.column_stack((hangle_swapped, vangle_swapped, co_amp_swapped, co_phase_swapped, cr_amp_swapped, cr_phase_swapped)), header=f"{self.axes[0]}[deg], {self.axes[1]}[deg], CoAmp[dB], CoPhase[deg], CrAmp[dB], CrPhase[deg]", fmt='%.3f, %.3f, %.3f, %.3f, %.3f, %.3f')
+
     
   # Export pattern cut data 
   def pattern_cut(self, constant_axis: str, constant_axis_value: float, frequency: float = 0.0, export: bool = True, plot: bool = False) -> None:
@@ -134,6 +178,7 @@ class AntennaMeasurementNSIBeamFile:
         plt.grid(True)
         plt.savefig(plot_file)
         plt.close()
+    
 
 
 def hello() -> str:

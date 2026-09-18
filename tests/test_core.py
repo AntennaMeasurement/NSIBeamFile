@@ -15,6 +15,19 @@ def test_antenna_measurement_nsi_beam_file_init():
 
   print(antenna_measurement.frequencies, antenna_measurement.skipped_rows, antenna_measurement.max_rows, antenna_measurement.axes)
   assert 0 == 0
+  
+def test_swap_axes():
+  from AntennaMeasurementNSIBeamFile.core import AntennaMeasurementNSIBeamFile
+
+  sample_folder = "sample_data" 
+
+  # Initialize the class
+  antenna_measurement = AntennaMeasurementNSIBeamFile(sample_folder)
+
+  # Swap axes for testing
+  antenna_measurement.swap_axes()
+
+  assert 0 == 0
 
 def test_export_pattern_cut():
   from AntennaMeasurementNSIBeamFile.core import AntennaMeasurementNSIBeamFile
