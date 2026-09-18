@@ -33,4 +33,4 @@ def test_export_pattern_cut():
   antenna_measurement.pattern_cut(constant_axis, constant_axis_value, frequency, export=True, plot=True)
 
   assert 0 == 0
-  
+

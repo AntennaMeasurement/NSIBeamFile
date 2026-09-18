@@ -33,6 +33,9 @@ class AntennaMeasurementNSIBeamFile:
           if "Frequency" in lines[i]:
             self.frequencies.append(float(lines[i+2].split()[1]))
             break
+          
+    # sort frequencies in ascending order
+    self.frequencies.sort()
     
     with open(self.beam_files[0]) as file:
       lines = file.readlines()
@@ -64,12 +67,16 @@ class AntennaMeasurementNSIBeamFile:
 
     # If frequency is not specified iterate through all beam files
     for i, beam_file in enumerate(self.beam_files):
+      # If a specific frequency is specified, skip beam files that do not match the frequency
+      if frequency != 0.0 and frequency != self.frequencies[i]:
+        continue
+      
       hangle, vangle, co_amp, co_phase = np.loadtxt(beam_file, skiprows=self.skipped_rows, max_rows=self.max_rows, unpack=True)
       hangle, vangle, cr_amp, cr_phase = np.loadtxt(beam_file, skiprows=self.skipped_rows+self.max_rows+2, max_rows=self.max_rows, unpack=True)
       
       axis_angles = [hangle, vangle]
       
-      # Checkf if the constant axis value exists in the axis angles
+      # Checkk if the constant axis value exists in the axis angles
       if constant_axis_value not in axis_angles[constant_axis_index]:
           raise ValueError(f"Constant axis value '{constant_axis_value}' not found in the axis angles")
         
