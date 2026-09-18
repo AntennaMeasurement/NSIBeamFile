@@ -4,45 +4,14 @@ def test_hello():
   expected = "Hello from AntennaMeasurementNSIBeamFile!"
   captured = hello()
   assert captured == expected
+  
+def test_antenna_measurement_nsi_beam_file_init():
+  from AntennaMeasurementNSIBeamFile.core import AntennaMeasurementNSIBeamFile
 
-def test_hello():
-  from AntennaMeasurementNSIBeamFile.core import hello
-  expected = "Hello from AntennaMeasurementNSIBeamFile!"
-  captured = hello()
-  assert captured == expected
+  sample_folder = "sample_data" 
 
-def test_hello():
-  from AntennaMeasurementNSIBeamFile.core import hello
-  expected = "Hello from AntennaMeasurementNSIBeamFile!"
-  captured = hello()
-  assert captured == expected
+  # Initialize the class
+  antenna_measurement = AntennaMeasurementNSIBeamFile(sample_folder)
 
-def test_hello():
-  from AntennaMeasurementNSIBeamFile.core import hello
-  expected = "Hello from AntennaMeasurementNSIBeamFile!"
-  captured = hello()
-  assert captured == expected
-
-def test_hello():
-  from AntennaMeasurementNSIBeamFile.core import hello
-  expected = "Hello from AntennaMeasurementNSIBeamFile!"
-  captured = hello()
-  assert captured == expected
-
-def test_hello():
-  from AntennaMeasurementNSIBeamFile.core import hello
-  expected = "Hello from AntennaMeasurementNSIBeamFile!"
-  captured = hello()
-  assert captured == expected
-
-def test_hello():
-  from AntennaMeasurementNSIBeamFile.core import hello
-  expected = "Hello from AntennaMeasurementNSIBeamFile!"
-  captured = hello()
-  assert captured == expected
-
-def test_hello():
-  from AntennaMeasurementNSIBeamFile.core import hello
-  expected = "Hello from AntennaMeasurementNSIBeamFile!"
-  captured = hello()
-  assert captured == expected
+  print(antenna_measurement.frequencies, antenna_measurement.skipped_rows, antenna_measurement.max_rows)
+  assert 0 == 0
