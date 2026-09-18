@@ -2,6 +2,8 @@
 import glob
 import os
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 class AntennaMeasurementNSIBeamFile:
   
@@ -49,7 +51,7 @@ class AntennaMeasurementNSIBeamFile:
     
     
   # Export pattern cut data 
-  def export_pattern_cut(self, constant_axis: str, constant_axis_value: float, frequency: float = 0.0) -> None:
+  def pattern_cut(self, constant_axis: str, constant_axis_value: float, frequency: float = 0.0, export: bool = True, plot: bool = False) -> None:
     # Check if frequency is specified and exists in the list of frequencies
     if frequency != 0.0 and frequency not in self.frequencies:
         raise ValueError(f"Frequency '{frequency}' not found in the list of frequencies")
@@ -58,6 +60,7 @@ class AntennaMeasurementNSIBeamFile:
     if constant_axis.lower() not in [axis.lower() for axis in self.axes] or constant_axis.upper() not in [axis.upper() for axis in self.axes]:
         raise ValueError(f"Invalid constant_axis '{constant_axis}'")
     constant_axis_index = [axis.lower() for axis in self.axes].index(constant_axis.lower())
+    constant_axis = self.axes[constant_axis_index]
 
     # If frequency is not specified iterate through all beam files
     for i, beam_file in enumerate(self.beam_files):
@@ -84,16 +87,46 @@ class AntennaMeasurementNSIBeamFile:
           cr_amp_cut.append(cr_amp[j])
           cr_phase_cut.append(cr_phase[j])
       
- 
-      # Create "Cuts" folder in the same directory as the beam file if it doesn't exist
-      cuts_folder = os.path.join(os.path.dirname(beam_file), "Cut/Data")
-      if not os.path.exists(cuts_folder):
-          os.makedirs(cuts_folder)
-          
-      # Save the pattern cut data to a file in the "Cuts" folder
-      cut_file = os.path.join(cuts_folder, f"{self.frequencies[i]:.3f}GHz_{constant_axis}={constant_axis_value:.03f}deg.csv")
-      np.savetxt(cut_file, np.column_stack((sweep_angle, co_amp_cut, co_phase_cut, cr_amp_cut, cr_phase_cut)), header="Angle[deg], Co_Amp[dB], Co_Phase[deg], Cross_Amp[dB], Cross_Phase[deg]", fmt='%.3f, %.6f, %.3f, %.6f, %.3f')
+      if export:
+        # Create "Cuts" folder in the same directory as the beam file if it doesn't exist
+        cut_data_folder = os.path.join(".", "Cut/Data")
+        cut_plot_folder = os.path.join(".", "Cut/Plot")
+        if not os.path.exists(cut_data_folder):
+            os.makedirs(cut_data_folder)
+        if not os.path.exists(cut_plot_folder):
+            os.makedirs(cut_plot_folder)
+        
+        # Save the pattern cut data to a file in the "Cuts" folder
+        data_file = os.path.join(cut_data_folder, f"{self.frequencies[i]:.3f}GHz_{constant_axis}={constant_axis_value:.03f}deg.csv")
+        np.savetxt(data_file, np.column_stack((sweep_angle, co_amp_cut, co_phase_cut, cr_amp_cut, cr_phase_cut)), header=f"{self.axes[1-constant_axis_index]}[deg], Co_Amp[dB], Co_Phase[deg], Cross_Amp[dB], Cross_Phase[deg]", fmt='%.3f, %.6f, %.3f, %.6f, %.3f')
 
+      if plot:
+        plot_file = os.path.join(cut_plot_folder, f"{self.frequencies[i]:.3f}GHz_{constant_axis}={constant_axis_value:.03f}deg_amplitude.png")
+        plt.figure()
+        plt.plot(sweep_angle, co_amp_cut, label="Co Amp")
+        plt.plot(sweep_angle, cr_amp_cut, label="Cross Amp")
+        plt.xlabel(f"Angle [{self.axes[1-constant_axis_index]}]")
+        plt.ylabel("Amplitude [dB]")
+        plt.title(f"Pattern Cut at {constant_axis}={constant_axis_value:.03f}deg")
+        plt.xlim(min(sweep_angle), max(sweep_angle))
+        plt.legend()
+        plt.grid(True)
+        plt.savefig(plot_file)
+        plt.close()
+        
+        plot_file = os.path.join(cut_plot_folder, f"{self.frequencies[i]:.3f}GHz_{constant_axis}={constant_axis_value:.03f}deg_phase.png")
+        plt.figure()
+        plt.plot(sweep_angle, co_phase_cut, label="Co Phase")
+        plt.plot(sweep_angle, cr_phase_cut, label="Cross Phase")
+        plt.xlabel(f"Angle [{self.axes[1-constant_axis_index]}]")
+        plt.ylabel("Phase [deg]")
+        plt.title(f"Pattern Cut at {constant_axis}={constant_axis_value:.03f}deg")
+        plt.xlim(min(sweep_angle), max(sweep_angle))
+        plt.ylim((-180.0, 180.0))
+        plt.legend()
+        plt.grid(True)
+        plt.savefig(plot_file)
+        plt.close()
 
 
 def hello() -> str:

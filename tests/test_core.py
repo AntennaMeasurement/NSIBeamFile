@@ -26,9 +26,11 @@ def test_export_pattern_cut():
 
   # Export a pattern cut for testing
   constant_axis = "theta"
-  constant_axis_value = 0.0
+  constant_axis_value = 90.0
+  # constant_axis = "phi"
+  # constant_axis_value = 0.0
   frequency = antenna_measurement.frequencies[0]
-  antenna_measurement.export_pattern_cut(constant_axis, constant_axis_value, frequency)
+  antenna_measurement.pattern_cut(constant_axis, constant_axis_value, frequency, export=True, plot=True)
 
   assert 0 == 0
   
