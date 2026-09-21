@@ -1,32 +1,78 @@
-# AntennaMeasurement NSIBeamFile Python Package and CLI
+# NSIBeamFile
 
-This package provides tools for working with NSI beam files.
+NSIBeamFile parses NSI2000 far-field beam files and provides Python and command-line tools for swapping axes and exporting or plotting pattern cuts.
 
 ## Features
-- Access far-field axes declared in NSI beam files
-- Access frequencies declared in NSI beam files
-- Export pattern cut data from NSI beam files
-- Plot pattern cut data from NSI beam files
+
+- Read the far-field axes and frequencies declared in NSI beam files.
+- Swap the beam-file axes and export the result as CSV files.
+- Export co-polarized and cross-polarized pattern-cut data as CSV files.
+- Plot pattern-cut amplitude and phase data as PNG files.
 
 ## Installation
 
-You can install the package using `pip`:
+Install the package from PyPI:
 
 ```bash
-pip install NSIBeamFile
+python -m pip install NSIBeamFile
 ```
 
-## CLI
+For a local development installation, including the test dependencies:
 
-The command line interface allows you to interact with the AntennaMeasurement NSIBeamFile package directly from the terminal. You can use the following commands:
+```bash
+python -m pip install -e ".[test]"
+```
 
-- `axes`: Access far-field axes declared in NSI beam files
-- `frequencies`: Access frequencies declared in NSI beam files
-- `pattern_cut`: Export and plot pattern cut data from NSI beam files
+## Command-line usage
 
-Use the `--help` flag with any command to see the available options.
+The CLI expects a folder containing files matching `*_beam*.txt`:
 
-## Standalone executable
+```bash
+amnsibeamfile FOLDER COMMAND [OPTIONS]
+```
+
+Available commands:
+
+- `swap`: Swap the beam-file axes and export CSV files.
+- `export`: Export pattern-cut data.
+- `plot`: Plot pattern-cut amplitude and phase data.
+
+Examples:
+
+```bash
+amnsibeamfile sample_data swap
+amnsibeamfile sample_data export --ax_name theta --ax_value 90.0
+amnsibeamfile sample_data export --ax_name theta --ax_value 90.0 --freq 10.0
+amnsibeamfile sample_data plot --ax_name theta --ax_value 90.0 --freq 10.0
+```
+
+Use `amnsibeamfile --help` or `amnsibeamfile FOLDER COMMAND --help` for the
+complete option list. Add `--info` or `--debug` before the command to enable
+logging.
+
+## Python usage
+
+```python
+from NSIBeamFile.core import NSIBeamFile
+
+measurement = NSIBeamFile("sample_data")
+print(measurement.axes)
+print(measurement.frequencies)
+
+measurement.pattern_cut(
+    ax_name="theta",
+    ax_value=90.0,
+    freq=10.0,
+    export=True,
+    plot=True,
+)
+```
+
+Pattern-cut data is written below the measurement folder in `Cut/Data`, and
+plots are written in `Cut/Plot`. Swapped data is written to a sibling folder
+whose name ends in `_Swapped`.
+
+## Building a standalone executable
 
 The CLI can be bundled into a single executable with PyInstaller. Build on the
 same operating system and architecture where the executable will be used.
@@ -41,8 +87,7 @@ python -m pip install -e ".[build]"
 python -m PyInstaller --clean NSIBeamFile.spec
 ```
 
-The executable is created at
-`dist\NSIBeamFileCli.exe`.
+The executable is created at `dist\amnsibeamfile.exe`.
 
 ### Linux or macOS
 
@@ -54,13 +99,12 @@ python -m pip install -e '.[build]'
 python -m PyInstaller --clean NSIBeamFile.spec
 ```
 
-The executable is created at `dist/NSIBeamFileCli`.
+The executable is created at `dist/amnsibeamfile`.
 
 Run the executable from a directory containing the measurement data, or pass
 an explicit data-folder path:
 
 ```text
-NSIBeamFileCli axes --folder sample_data
-NSIBeamFileCli frequencies --folder sample_data
-NSIBeamFileCli pattern_cut --folder sample_data --constant_axis theta --constant_axis_value 90 --frequency 10 --export
+amnsibeamfile sample_data swap
+amnsibeamfile sample_data export --ax_name theta --ax_value 90.0 --freq 10.0
 ```
