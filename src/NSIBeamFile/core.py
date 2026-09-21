@@ -145,21 +145,21 @@ class NSIBeamFile:
       logger.debug(f"[{self.__class__.__name__}] Time taken for swapping arrays: {toc - tic:.3f} seconds")
     
   # Export pattern cut data 
-  def pattern_cut(self, constant_axis: str, constant_axis_value: float, frequency: float = 0.0, export: bool = True, plot: bool = False) -> None:
+  def pattern_cut(self, ax_name: str, ax_value: float, freq: float = 0.0, export: bool = True, plot: bool = False) -> None:
     # Check if frequency is specified and exists in the list of frequencies
-    if frequency != 0.0 and frequency not in self.frequencies:
-        raise ValueError(f"Frequency '{frequency}' not found in the list of frequencies")
+    if freq != 0.0 and freq not in self.frequencies:
+        raise ValueError(f"Frequency '{freq}' not found in the list of frequencies")
       
     # Check constant axis allow lowercase and uppercase versions
-    if constant_axis.lower() not in [axis.lower() for axis in self.axes] or constant_axis.upper() not in [axis.upper() for axis in self.axes]:
-        raise ValueError(f"Invalid constant_axis '{constant_axis}'")
-    constant_axis_index = [axis.lower() for axis in self.axes].index(constant_axis.lower())
-    constant_axis = self.axes[constant_axis_index]
+    if ax_name.lower() not in [axis.lower() for axis in self.axes] or ax_name.upper() not in [axis.upper() for axis in self.axes]:
+        raise ValueError(f"Invalid axis name'{ax_name}'")
+    constant_axis_index = [axis.lower() for axis in self.axes].index(ax_name.lower())
+    ax_name = self.axes[constant_axis_index]
 
     # If frequency is not specified iterate through all beam files
     for i, beam_file in enumerate(self.beam_files):
       # If a specific frequency is specified, skip beam files that do not match the frequency
-      if frequency != 0.0 and frequency != self.frequencies[i]:
+      if freq != 0.0 and freq != self.frequencies[i]:
         continue
       
       hangle, vangle, co_amp, co_phase = np.loadtxt(beam_file, skiprows=self.skipped_rows, max_rows=self.max_rows, unpack=True)
@@ -168,8 +168,8 @@ class NSIBeamFile:
       axis_angles = [hangle, vangle]
       
       # Checkk if the constant axis value exists in the axis angles
-      if constant_axis_value not in axis_angles[constant_axis_index]:
-          raise ValueError(f"Constant axis value '{constant_axis_value}' not found in the axis angles")
+      if ax_value not in axis_angles[constant_axis_index]:
+          raise ValueError(f"Constant axis value '{ax_value}' not found in the axis angles")
         
       # Extract the cut data for the specified constant axis value
       sweep_angle  = []
@@ -178,7 +178,7 @@ class NSIBeamFile:
       cr_amp_cut   = []
       cr_phase_cut = []
       for j in range(len(axis_angles[constant_axis_index])):
-        if axis_angles[constant_axis_index][j] == constant_axis_value:
+        if axis_angles[constant_axis_index][j] == ax_value:
           sweep_angle.append(axis_angles[1-constant_axis_index][j])
           co_amp_cut.append(co_amp[j])
           co_phase_cut.append(co_phase[j])
@@ -192,7 +192,7 @@ class NSIBeamFile:
             os.makedirs(cut_data_folder)
         
         # Save the pattern cut data to a file in the "Cuts" folder
-        data_file = os.path.join(cut_data_folder, f"{self.frequencies[i]:.3f}GHz_{constant_axis}={constant_axis_value:.03f}deg.csv")
+        data_file = os.path.join(cut_data_folder, f"{self.frequencies[i]:.3f}GHz_{ax_name}={ax_value:.03f}deg.csv")
         np.savetxt(data_file, np.column_stack((sweep_angle, co_amp_cut, co_phase_cut, cr_amp_cut, cr_phase_cut)), header=f"{self.axes[1-constant_axis_index]}[deg], Co_Amp[dB], Co_Phase[deg], Cross_Amp[dB], Cross_Phase[deg]", fmt='%.3f, %.6f, %.3f, %.6f, %.3f')
 
       if plot:
@@ -201,26 +201,26 @@ class NSIBeamFile:
         if not os.path.exists(cut_plot_folder):
             os.makedirs(cut_plot_folder)
             
-        plot_file = os.path.join(cut_plot_folder, f"{self.frequencies[i]:.3f}GHz_{constant_axis}={constant_axis_value:.03f}deg_amplitude.png")
+        plot_file = os.path.join(cut_plot_folder, f"{self.frequencies[i]:.3f}GHz_{ax_name}={ax_value:.03f}deg_amplitude.png")
         plt.figure()
         plt.plot(sweep_angle, co_amp_cut, label="CoPol")
         plt.plot(sweep_angle, cr_amp_cut, label="CrPol")
         plt.xlabel(f"Angle [{self.axes[1-constant_axis_index]}]")
         plt.ylabel("Amplitude [dB]")
-        plt.title(f"Pattern Cut at {constant_axis}={constant_axis_value:.03f}deg")
+        plt.title(f"Pattern Cut at {ax_name}={ax_value:.03f}deg")
         plt.xlim(min(sweep_angle), max(sweep_angle))
         plt.legend()
         plt.grid(True)
         plt.savefig(plot_file)
         plt.close()
         
-        plot_file = os.path.join(cut_plot_folder, f"{self.frequencies[i]:.3f}GHz_{constant_axis}={constant_axis_value:.03f}deg_phase.png")
+        plot_file = os.path.join(cut_plot_folder, f"{self.frequencies[i]:.3f}GHz_{ax_name}={ax_value:.03f}deg_phase.png")
         plt.figure()
         plt.plot(sweep_angle, co_phase_cut, label="CoPol")
         plt.plot(sweep_angle, cr_phase_cut, label="CrPol")
         plt.xlabel(f"Angle [{self.axes[1-constant_axis_index]}]")
         plt.ylabel("Phase [deg]")
-        plt.title(f"Pattern Cut at {constant_axis}={constant_axis_value:.03f}deg")
+        plt.title(f"Pattern Cut at {ax_name}={ax_value:.03f}deg")
         plt.xlim(min(sweep_angle), max(sweep_angle))
         plt.ylim((-180.0, 180.0))
         plt.legend()

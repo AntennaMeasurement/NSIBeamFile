@@ -14,9 +14,9 @@ def main(argv: list[str] | None = None) -> int:
   argv = sys.argv[1:] if argv is None else argv
 
   parser = argparse.ArgumentParser(
-    prog="amsnsibeamfile",
+    prog="amnsibeamfile",
     description="NSIBeamFile Command Line Interface",
-    usage="%(prog)s folder command{swap,export,plot} ...",
+    # usage="%(prog)s folder command{swap,export,plot} ...",
     # # Replace "{swap,export,plot}" text in help message with "commands" for clarity
     # formatter_class=argparse.RawTextHelpFormatter,
     # epilog="Commands: swap, export, plot",
@@ -30,16 +30,16 @@ def main(argv: list[str] | None = None) -> int:
   parser.add_argument("--info",    action="store_true", help="Enable info mode")
   parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
   # subcommands 
-  subparser = parser.add_subparsers(dest="command{swap,export,plot}", required=True)
+  subparser = parser.add_subparsers(dest="command", required=True)
   subparser.add_parser("swap", help="Swap axes in the measurement data and export it")
   export = subparser.add_parser("export", help="Export cut data")
-  export.add_argument("--name", help="Constant axis name for the pattern cut", type=str, nargs=1)
-  export.add_argument("--value", help="Value for the constant axis in the pattern cut", type=float, nargs=1)
-  export.add_argument("--freq", help="Frequency for the pattern cut", type=float, nargs=1)
+  export.add_argument("--ax_name", help="Constant axis name for the pattern cut", type=str, nargs=1, required=True)
+  export.add_argument("--ax_value", help="Value for the constant axis in the pattern cut", type=float, nargs=1, required=True)
+  export.add_argument("--freq", help="Frequency for the pattern cut if not specified, all frequencies are considered", type=float, nargs=1, default=[0.0])
   plot = subparser.add_parser("plot", help="Plot cut data")
-  plot.add_argument("--name", help="Constant axis name for the pattern cut", type=str, nargs=1)
-  plot.add_argument("--value", help="Value for the constant axis in the pattern cut", type=float, nargs=1)
-  plot.add_argument("--freq", help="Frequency for the pattern cut", type=float, nargs=1)  
+  plot.add_argument("--ax_name", help="Constant axis name for the pattern cut", type=str, nargs=1, required=True)
+  plot.add_argument("--ax_value", help="Value for the constant axis in the pattern cut", type=float, nargs=1, required=True)
+  plot.add_argument("--freq", help="Frequency for the pattern cut if not specified, all frequencies are considered", type=float, nargs=1, default=[0.0])  
   try:
     args = parser.parse_args(argv)
     folder = args.folder[0]
@@ -48,17 +48,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "swap":
       measurement.swap_axes()
     elif args.command == "export":
-      measurement.pattern_cut(constant_axis=args.name[0],
-                             constant_axis_value=args.value[0],
-                             frequency=args.freq[0],
-                             export=True,
-                             plot=False)
+      measurement.pattern_cut(ax_name=args.ax_name[0], ax_value=args.ax_value[0], freq=args.freq[0], export=True, plot=False)
     elif args.command == "plot":
-      measurement.pattern_cut(constant_axis=args.name[0],
-                             constant_axis_value=args.value[0],
-                             frequency=args.freq[0],
-                             export=False,
-                             plot=True)
+      measurement.pattern_cut(ax_name=args.ax_name[0], ax_value=args.ax_value[0], freq=args.freq[0], export=False, plot=True)
     # print(json.dumps({"success": 1}))
     return 0  
   except SystemExit as exc:
