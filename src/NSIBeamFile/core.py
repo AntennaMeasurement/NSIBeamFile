@@ -117,16 +117,16 @@ class NSIBeamFile:
       hangle_swapped = []
       
 
-      for m in range(self.vangle_size):
-        mask = (vangle == vangle_list[m])
+      for m in range(self.hangle_size):
+        mask = (hangle == hangle_list[m])
         # filter amplitude based on the mask
         co_amp_swapped[m, :] = co_amp[mask]
         cr_amp_swapped[m, :] = cr_amp[mask]
         co_phase_swapped[m, :] = co_phase[mask]
         cr_phase_swapped[m, :] = cr_phase[mask]
-        for n in range(self.hangle_size):
-          vangle_swapped.append(vangle_list[m])
-          hangle_swapped.append(hangle_list[n])
+        for n in range(self.vangle_size):
+          hangle_swapped.append(hangle_list[m])
+          vangle_swapped.append(vangle_list[n])
 
       # flattan the swapped arrays
       co_amp_swapped = np.ravel(co_amp_swapped)
@@ -139,7 +139,7 @@ class NSIBeamFile:
       if not os.path.exists(swapped_data_folder):
         os.makedirs(swapped_data_folder)
       
-      np.savetxt(os.path.join(swapped_data_folder, f"{self.frequencies[i]:.3f}GHz.csv"), np.column_stack((vangle_swapped, hangle_swapped, co_amp_swapped, co_phase_swapped, cr_amp_swapped, cr_phase_swapped)), header=f"{self.axes[0]}[deg], {self.axes[1]}[deg], CoAmp[dB], CoPhase[deg], CrAmp[dB], CrPhase[deg]", fmt='%.3f, %.3f, %.3f, %.3f, %.3f, %.3f')
+      np.savetxt(os.path.join(swapped_data_folder, f"{self.frequencies[i]:.3f}GHz.csv"), np.column_stack((hangle_swapped, vangle_swapped, co_amp_swapped, co_phase_swapped, cr_amp_swapped, cr_phase_swapped)), header=f"{self.axes[0]}[deg], {self.axes[1]}[deg], CoAmp[dB], CoPhase[deg], CrAmp[dB], CrPhase[deg]", fmt='%.3f, %.3f, %.3f, %.3f, %.3f, %.3f')
 
     # Stop the chronometer if debug is enabled
     if self.debug:
