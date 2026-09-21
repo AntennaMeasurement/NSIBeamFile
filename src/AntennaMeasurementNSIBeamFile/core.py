@@ -69,32 +69,41 @@ class AntennaMeasurementNSIBeamFile:
       hangle_list = np.linspace(np.min(hangle), np.max(hangle), self.hangle_size)
       vangle_list = np.linspace(np.min(vangle), np.max(vangle), self.vangle_size)
       
-      co_amp_swapped = []
-      cr_amp_swapped = []
-      co_phase_swapped = []
-      cr_phase_swapped = []
-      hangle_swapped = []
+      # Create with empty arrays with zero size for swapped data
+      co_amp_swapped = np.ndarray((self.vangle_size, self.hangle_size))
+      cr_amp_swapped = np.ndarray((self.vangle_size, self.hangle_size))
+      co_phase_swapped = np.ndarray((self.vangle_size, self.hangle_size))
+      cr_phase_swapped = np.ndarray((self.vangle_size, self.hangle_size))
+        
       vangle_swapped = []
+      hangle_swapped = []
       
-      for m in range(self.hangle_size):
-        for n in range(self.vangle_size):
-          
-          for k in range(len(hangle)):
-            if hangle[k] == hangle_list[m] and vangle[k] == vangle_list[n]:
-              hangle_swapped.append(hangle[k])
-              vangle_swapped.append(vangle[k])
-              co_amp_swapped.append(co_amp[k])
-              cr_amp_swapped.append(cr_amp[k])
-              co_phase_swapped.append(co_phase[k])
-              cr_phase_swapped.append(cr_phase[k])
-              break
-            
+      
+      # For each element in the original co_amp array, place it in the swapped array based on the new angle lists by masking
+      for m in range(self.vangle_size):
+        print(f"Processing vangle index {m}, vangle value {vangle_list[m]}")
+        mask = (vangle == vangle_list[m])
+        # filter amplitude based on the mask
+        co_amp_swapped[m, :] = co_amp[mask]
+        cr_amp_swapped[m, :] = cr_amp[mask]
+        co_phase_swapped[m, :] = co_phase[mask]
+        cr_phase_swapped[m, :] = cr_phase[mask]
+        for n in range(self.hangle_size):
+          vangle_swapped.append(vangle_list[m])
+          hangle_swapped.append(hangle_list[n])
+      
+      # flattan the swapped arrays
+      co_amp_swapped = np.ravel(co_amp_swapped)
+      cr_amp_swapped = np.ravel(cr_amp_swapped)
+      co_phase_swapped = np.ravel(co_phase_swapped)
+      cr_phase_swapped = np.ravel(cr_phase_swapped)
+      
       # Write the swapped data back to the file or a new file
       swapped_data_folder = os.path.join(".", "Swapped")
       if not os.path.exists(swapped_data_folder):
           os.makedirs(swapped_data_folder)
       
-      np.savetxt(os.path.join(swapped_data_folder, os.path.basename(beam_file)), np.column_stack((hangle_swapped, vangle_swapped, co_amp_swapped, co_phase_swapped, cr_amp_swapped, cr_phase_swapped)), header=f"{self.axes[0]}[deg], {self.axes[1]}[deg], CoAmp[dB], CoPhase[deg], CrAmp[dB], CrPhase[deg]", fmt='%.3f, %.3f, %.3f, %.3f, %.3f, %.3f')
+      np.savetxt(os.path.join(swapped_data_folder, os.path.basename(beam_file)), np.column_stack((vangle_swapped, hangle_swapped, co_amp_swapped, co_phase_swapped, cr_amp_swapped, cr_phase_swapped)), header=f"{self.axes[0]}[deg], {self.axes[1]}[deg], CoAmp[dB], CoPhase[deg], CrAmp[dB], CrPhase[deg]", fmt='%.3f, %.3f, %.3f, %.3f, %.3f, %.3f')
 
     
   # Export pattern cut data 
