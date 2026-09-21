@@ -2,7 +2,6 @@
 sample_data
 Cut
 Swapped
-!NSIBeamFile.spec
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -224,3 +223,5 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+!NSIBeamFile.spec
