@@ -57,8 +57,10 @@ class NSIBeamFile:
             self.frequencies.append(float(lines[i+2].split()[1]))
             break
           
-    # sort frequencies in ascending order
-    self.frequencies.sort()
+    # sort frequencies in ascending order also match index with beam files
+    sorted_indices = np.argsort(self.frequencies)
+    self.frequencies = [self.frequencies[i] for i in sorted_indices]
+    self.beam_files = [self.beam_files[i] for i in sorted_indices]
     
     with open(self.beam_files[0]) as file:
       lines = file.readlines()

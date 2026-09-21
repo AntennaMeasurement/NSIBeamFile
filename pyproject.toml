@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "NSIBeamFile"
-version = "0.1.0"
+version = "0.1.1"
 description = "NSI2000 Antenna Measurement Software Far-Field Beam File Parser"
 authors = [{name = "Hüseyin YİĞİT", email = "yigit.hsyn@gmail.com"}]
 license = { text = "MIT" }
