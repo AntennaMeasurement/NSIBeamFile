@@ -13,7 +13,7 @@ This package provides tools for working with NSI beam files.
 You can install the package using `pip`:
 
 ```bash
-pip install AntennaMeasurementNSIBeamFile
+pip install NSIBeamFile
 ```
 
 ## CLI
@@ -38,11 +38,11 @@ py -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 python -m pip install -e ".[build]"
-python -m PyInstaller --clean AntennaMeasurementNSIBeamFile.spec
+python -m PyInstaller --clean NSIBeamFile.spec
 ```
 
 The executable is created at
-`dist\AntennaMeasurementNSIBeamFileCli.exe`.
+`dist\NSIBeamFileCli.exe`.
 
 ### Linux or macOS
 
@@ -51,16 +51,16 @@ python3 -m venv .venv
 . .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -e '.[build]'
-python -m PyInstaller --clean AntennaMeasurementNSIBeamFile.spec
+python -m PyInstaller --clean NSIBeamFile.spec
 ```
 
-The executable is created at `dist/AntennaMeasurementNSIBeamFileCli`.
+The executable is created at `dist/NSIBeamFileCli`.
 
 Run the executable from a directory containing the measurement data, or pass
 an explicit data-folder path:
 
 ```text
-AntennaMeasurementNSIBeamFileCli axes --folder sample_data
-AntennaMeasurementNSIBeamFileCli frequencies --folder sample_data
-AntennaMeasurementNSIBeamFileCli pattern_cut --folder sample_data --constant_axis theta --constant_axis_value 90 --frequency 10 --export
+NSIBeamFileCli axes --folder sample_data
+NSIBeamFileCli frequencies --folder sample_data
+NSIBeamFileCli pattern_cut --folder sample_data --constant_axis theta --constant_axis_value 90 --frequency 10 --export
 ```

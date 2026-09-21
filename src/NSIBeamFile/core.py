@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-class AntennaMeasurementNSIBeamFile:
+class NSIBeamFile:
   
   # Constructor initialize class with an folder name containing beam files  
   def __init__(self, folder: str):
@@ -191,4 +191,4 @@ class AntennaMeasurementNSIBeamFile:
 
 
 def hello() -> str:
-    return "Hello from AntennaMeasurementNSIBeamFile!"
+    return "Hello from NSIBeamFile!"

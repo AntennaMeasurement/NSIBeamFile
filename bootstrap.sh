@@ -1,6 +1,6 @@
 #!/bin/bash
 
-package_name="AntennaMeasurementNSIBeamFile"
+package_name="NSIBeamFile"
 package_description="NSI2000 Antenna Measurement Software Far-Field Beam File Parser"
 package_author="Hüseyin YİĞİT"
 package_author_email="yigit.hsyn@gmail.com"

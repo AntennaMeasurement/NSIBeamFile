@@ -1,28 +1,28 @@
 
 def test_hello():
-  from AntennaMeasurementNSIBeamFile.core import hello
-  expected = "Hello from AntennaMeasurementNSIBeamFile!"
+  from NSIBeamFile.core import hello
+  expected = "Hello from NSIBeamFile!"
   captured = hello()
   assert captured == expected
   
 def test_antenna_measurement_nsi_beam_file_init():
-  from AntennaMeasurementNSIBeamFile.core import AntennaMeasurementNSIBeamFile
+  from NSIBeamFile.core import NSIBeamFile
 
   sample_folder = "sample_data" 
 
   # Initialize the class
-  antenna_measurement = AntennaMeasurementNSIBeamFile(sample_folder)
+  antenna_measurement = NSIBeamFile(sample_folder)
 
   print(antenna_measurement.frequencies, antenna_measurement.skipped_rows, antenna_measurement.max_rows, antenna_measurement.axes)
   assert 0 == 0
   
 def test_swap_axes():
-  from AntennaMeasurementNSIBeamFile.core import AntennaMeasurementNSIBeamFile
+  from NSIBeamFile.core import NSIBeamFile
 
   sample_folder = "sample_data" 
 
   # Initialize the class
-  antenna_measurement = AntennaMeasurementNSIBeamFile(sample_folder)
+  antenna_measurement = NSIBeamFile(sample_folder)
 
   # Swap axes for testing
   antenna_measurement.swap_axes()
@@ -30,12 +30,12 @@ def test_swap_axes():
   assert 0 == 0
 
 def test_export_pattern_cut():
-  from AntennaMeasurementNSIBeamFile.core import AntennaMeasurementNSIBeamFile
+  from NSIBeamFile.core import NSIBeamFile
 
   sample_folder = "sample_data" 
 
   # Initialize the class
-  antenna_measurement = AntennaMeasurementNSIBeamFile(sample_folder)
+  antenna_measurement = NSIBeamFile(sample_folder)
 
   # Export a pattern cut for testing
   constant_axis = "theta"
