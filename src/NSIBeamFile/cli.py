@@ -13,95 +13,60 @@ from NSIBeamFile.core import NSIBeamFile
 def main(argv: list[str] | None = None) -> int:
   argv = sys.argv[1:] if argv is None else argv
 
-  parser = argparse.ArgumentParser(prog="NSIBeamFileCli", description="NSIBeamFile Command Line Interface")
-  parser.add_argument("axes", help="Far-field axes declared in NSI beam files", type=str, nargs="?")
-  parser.add_argument("frequencies", help="Frequencies declared in NSI beam files", type=str, nargs="?")
-  parser.add_argument("pattern_cut", help="Export and plot pattern cut data from NSI beam files", type=str, nargs="?")
+  parser = argparse.ArgumentParser(prog="amsnsibeamfile", description="NSIBeamFile Command Line Interface")
+  # folfer name as positional argument
+  parser.add_argument("folder", help="Measurement data folder that contains the NSI beam files", type=str, nargs=1)
+  # flags 
+  parser.add_argument("--debug",   action="store_true", help="Enable debug mode")
+  parser.add_argument("--info",    action="store_true", help="Enable info mode")
   parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
+  # subcommands 
+  subparser = parser.add_subparsers(dest="command")
+  swap = subparser.add_parser("swap", help="Swap axes in the measurement data and export it")
+  export = subparser.add_parser("export", help="Export cut data")
+  export.add_argument("--name", help="Constant axis name for the pattern cut", type=str, nargs=1)
+  export.add_argument("--value", help="Value for the constant axis in the pattern cut", type=float, nargs=1)
+  export.add_argument("--freq", help="Frequency for the pattern cut", type=float, nargs=1)
+  plot = subparser.add_parser("plot", help="Plot cut data")
+  plot.add_argument("--name", help="Constant axis name for the pattern cut", type=str, nargs=1)
+  plot.add_argument("--value", help="Value for the constant axis in the pattern cut", type=float, nargs=1)
+  plot.add_argument("--freq", help="Frequency for the pattern cut", type=float, nargs=1)  
   try:
     args = parser.parse_args(argv)
+    folder = args.folder[0]
+    measurement = NSIBeamFile(folder, debug=args.debug, info=args.info)
+    # Construct new parser for subcommands if needed
+    if args.command == "swap":
+      measurement.swap_axes()
+    elif args.command == "export":
+      measurement.pattern_cut(constant_axis=args.name[0],
+                             constant_axis_value=args.value[0],
+                             frequency=args.freq[0],
+                             export=True,
+                             plot=False)
+    elif args.command == "plot":
+      measurement.pattern_cut(constant_axis=args.name[0],
+                             constant_axis_value=args.value[0],
+                             frequency=args.freq[0],
+                             export=False,
+                             plot=True)
+    print(json.dumps({"success": 1}))
+    return 0  
   except SystemExit as exc:
+    # print(f"SystemExit with code: {exc.code}")
     # argparse's --help/--version actions exit directly; normalize to a return code.
+    # print(parser.format_help().replace("positional arguments","module/function"))
+    # print(exc.code if isinstance(exc.code, int) else 0)
+    if exc.code != 0:
+      print(json.dumps({"success": 0, "message": str(exc)}))
     return exc.code if isinstance(exc.code, int) else 0
-  print(parser.format_help().replace("positional arguments","module/function"))
-  return 0  
+  # catch all other exceptions
+  except Exception as exc:
+    print(json.dumps({"success": 0, "message": str(exc)}))
+    print(f"{parser.prog}: internal error: {exc}")
+    return 1
   
 
-  # if argv and argv[0] == "axes":
-  #   parser = argparse.ArgumentParser(prog="axes", description="Far-field axes declared in NSI beam files")
-  #   parser.add_argument("--folder", help="Measurement data folder that contains the NSI beam files", type=str, nargs=1)
-  #   try:
-  #     args = parser.parse_args(argv[1:])
-  #   except SystemExit as exc:
-  #     # argparse's --help/--version actions exit directly; normalize to a return code.
-  #     return exc.code if isinstance(exc.code, int) else 0
-  #   if args.folder:
-  #     folder = args.folder[0]
-  #     measurement = NSIBeamFile(folder)
-  #     print(json.dumps({"success": 1, "axes": measurement.axes}))
-  #     return 0
-  #   else:
-  #     print(json.dumps({"success": 0, "error": "Folder argument is required"}))
-  #     return 1
-    
-  
-  # elif argv and argv[0] == "frequencies":
-  #   parser = argparse.ArgumentParser(prog="frequencies", description="Frequencies declared in NSI beam files")
-  #   parser.add_argument("--folder", help="Measurement data folder that contains the NSI beam files", type=str, nargs=1)
-  #   try:
-  #     args = parser.parse_args(argv[1:])
-  #   except SystemExit as exc:
-  #     # argparse's --help/--version actions exit directly; normalize to a return code.
-  #     return exc.code if isinstance(exc.code, int) else 0
-  #   if args.folder:
-  #     folder = args.folder[0]
-  #     measurement = NSIBeamFile(folder)
-  #     print(json.dumps({"success": 1, "frequencies": measurement.frequencies}))
-  #     return 0
-  #   else:
-  #     print(json.dumps({"success": 0, "error": "Folder argument is required"}))
-  #     return 1
-  
-  # elif argv and argv[0] == "pattern_cut":
-  #   parser = argparse.ArgumentParser(prog="pattern_cut", description="Export pattern cut data from NSI beam files")
-  #   parser.add_argument("--folder", help="Measurement data folder that contains the NSI beam files", type=str, nargs=1)
-  #   parser.add_argument("--constant_axis", help="Constant axis name for the pattern cut like theta, phi ...", type=str, nargs=1)
-  #   parser.add_argument("--constant_axis_value", help="Value of the constant axis for the pattern cut in degrees", type=float, nargs=1)
-  #   parser.add_argument("--frequency", help="Frequency in the pattern cut data you are interested in GHz", type=float, nargs="?")
-  #   parser.add_argument("--export", help="Export the pattern cut data default behavior is True (can be disabled with --no-export)", action="store_true")
-  #   parser.add_argument("--plot", help="Plot the pattern cut data", action="store_true")
-  #   try:
-  #     args = parser.parse_args(argv[1:])
-  #   except SystemExit as exc:
-  #     return exc.code if isinstance(exc.code, int) else 0
-  #   if args.folder and args.constant_axis and args.constant_axis_value:
-  #     folder = args.folder[0]
-  #     constant_axis = args.constant_axis[0]
-  #     constant_axis_value = args.constant_axis_value[0]
-  #     frequency = args.frequency if args.frequency else 0.0
-  #     export = args.export if args.export else True
-  #     plot = args.plot
-  #     measurement = NSIBeamFile(folder)
-  #     measurement.pattern_cut(constant_axis, constant_axis_value, frequency, export, plot)
-  #     return 0
-  #   else:
-  #     print(json.dumps({"success": 0, "error": "Folder, constant_axis, and constant_axis_value arguments are required"}))
-  #     return 1
-  
-  
-  # else:
-  #   parser = argparse.ArgumentParser(prog="NSIBeamFileCli", description="NSIBeamFile Command Line Interface")
-  #   parser.add_argument("axes", help="Far-field axes declared in NSI beam files", type=str, nargs="?")
-  #   parser.add_argument("frequencies", help="Frequencies declared in NSI beam files", type=str, nargs="?")
-  #   parser.add_argument("pattern_cut", help="Export and plot pattern cut data from NSI beam files", type=str, nargs="?")
-  #   parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
-  #   try:
-  #     args = parser.parse_args(argv)
-  #   except SystemExit as exc:
-  #     # argparse's --help/--version actions exit directly; normalize to a return code.
-  #     return exc.code if isinstance(exc.code, int) else 0
-  #   print(parser.format_help().replace("positional arguments","module/function"))
-  #   return 0
 
 
 
