@@ -2,6 +2,7 @@
 sample_data
 Cut
 Swapped
+!NSIBeamFile.spec
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
