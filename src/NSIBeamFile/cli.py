@@ -16,7 +16,7 @@ def main(argv: list[str] | None = None) -> int:
   parser = argparse.ArgumentParser(
     prog="amsnsibeamfile",
     description="NSIBeamFile Command Line Interface",
-    usage="%(prog)s folder {swap,export,plot} ...",
+    usage="%(prog)s folder command{swap,export,plot} ...",
     # # Replace "{swap,export,plot}" text in help message with "commands" for clarity
     # formatter_class=argparse.RawTextHelpFormatter,
     # epilog="Commands: swap, export, plot",
@@ -30,7 +30,7 @@ def main(argv: list[str] | None = None) -> int:
   parser.add_argument("--info",    action="store_true", help="Enable info mode")
   parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
   # subcommands 
-  subparser = parser.add_subparsers(dest="command", required=True)
+  subparser = parser.add_subparsers(dest="command{swap,export,plot}", required=True)
   subparser.add_parser("swap", help="Swap axes in the measurement data and export it")
   export = subparser.add_parser("export", help="Export cut data")
   export.add_argument("--name", help="Constant axis name for the pattern cut", type=str, nargs=1)
